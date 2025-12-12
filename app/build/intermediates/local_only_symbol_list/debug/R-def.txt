@@ -1,0 +1,21 @@
+R_DEF: Internal format may change without notice
+local
+color black
+color purple_200
+color purple_500
+color purple_700
+color teal_200
+color teal_700
+color white
+id centsOffset
+id frequency
+id powerMeter
+id status
+id stringName
+id title
+layout activity_main
+string app_name
+string listening
+string no_signal
+string permission_rationale
+style Theme.Tuner

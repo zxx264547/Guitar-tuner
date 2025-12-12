@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Guitar Tuner</string>
+    <string name="permission_rationale">需要麦克风权限来捕获吉他声。</string>
+    <string name="listening">正在监听…</string>
+    <string name="no_signal">请弹响一根弦或靠近麦克风</string>
+</resources>
