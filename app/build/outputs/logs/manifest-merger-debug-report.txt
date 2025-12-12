@@ -86,9 +86,9 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Administrator\.gra
 	android:label
 		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:9:9-41
 	android:roundIcon
-		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:10:9-63
+		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:10:9-54
 	android:icon
-		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:8:9-58
+		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:8:9-43
 	android:allowBackup
 		ADDED from F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:7:9-35
 	android:theme

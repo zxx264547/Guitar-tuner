@@ -31,12 +31,12 @@
 21-->[androidx.core:core:1.9.0] C:\Users\Administrator\.gradle\caches\8.9\transforms\2668e7cc08e770202b88f1b0d153a0f4\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
 22        android:debuggable="true"
 23        android:extractNativeLibs="false"
-24        android:icon="@android:drawable/sym_def_app_icon"
-24-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:8:9-58
+24        android:icon="@mipmap/ic_launcher"
+24-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:8:9-43
 25        android:label="@string/app_name"
 25-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:9:9-41
-26        android:roundIcon="@android:drawable/sym_def_app_icon"
-26-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:10:9-63
+26        android:roundIcon="@mipmap/ic_launcher_round"
+26-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:10:9-54
 27        android:supportsRtl="true"
 27-->F:\AndroidStudioProjects\tunerV2\app\src\main\AndroidManifest.xml:11:9-35
 28        android:testOnly="true"
