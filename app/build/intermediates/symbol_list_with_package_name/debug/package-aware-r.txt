@@ -3304,6 +3304,10 @@ id italic
 id item_touch_helper_previous_elevation
 id jumpToEnd
 id jumpToStart
+id labelNoiseFloor
+id labelSmoothing
+id labelWindowSize
+id labelYinThreshold
 id labeled
 id layout
 id left
@@ -3464,6 +3468,8 @@ id search_voice_btn
 id select_dialog_listview
 id selected
 id selection_type
+id settingsPanel
+id settingsTitle
 id sharedValueSet
 id sharedValueUnset
 id shortcut
@@ -3474,6 +3480,10 @@ id sin
 id skipCollapsed
 id skipped
 id slide
+id sliderNoiseFloor
+id sliderSmoothing
+id sliderWindowSize
+id sliderYinThreshold
 id snackbar_action
 id snackbar_text
 id snap
@@ -3555,6 +3565,10 @@ id uniform
 id unlabeled
 id up
 id useLogo
+id valueNoiseFloor
+id valueSmoothing
+id valueWindowSize
+id valueYinThreshold
 id vertical_only
 id view_offset_helper
 id view_transition

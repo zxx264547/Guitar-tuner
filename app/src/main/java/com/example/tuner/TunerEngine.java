@@ -2,6 +2,10 @@ package com.example.tuner;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import java.util.Arrays;
+
 class TunerEngine {
 
     interface Listener {
@@ -9,11 +13,8 @@ class TunerEngine {
     }
 
     private static final String TAG = "TunerEngine";
-    private static final int WINDOW_SIZE = 4096;
     private static final double MIN_FREQ = 70.0;    // lower than low E to keep margin
     private static final double MAX_FREQ = 1300.0;  // upper bound to avoid octave errors
-    private static final double SMOOTHING_ALPHA = 0.2;
-    private static final double NOISE_FLOOR_DB = -50.0;
 
     private static final String[] GUITAR_STRINGS = {"E2", "A2", "D3", "G3", "B3", "E4"};
     private static final double[] STRING_FREQ = {82.4069, 110.0, 146.832, 195.998, 246.942, 329.628};
@@ -22,11 +23,25 @@ class TunerEngine {
 
     private volatile boolean running;
     private int sampleRate = 44100;
+    private int windowSize = 8192;
+    private int hopSize = 2048;
+    private double smoothingAlpha = 0.1;
+    private double noiseFloorDb = -50.0;
+    private double yinThreshold = 0.15;
     private double smoothedFrequency = 0;
     private int stableHits = 0;
-    private double[] windowCoefficients = new double[WINDOW_SIZE];
+    private double[] windowCoefficients = new double[windowSize];
     private double[] diffScratch;
     private double[] cmndfScratch;
+    private short[] ringBuffer = new short[windowSize];
+    private short[] analysisBuffer = new short[windowSize];
+    private int ringWritePos = 0;
+    private int ringFilled = 0;
+    private int pendingSamples = 0;
+    private double[] freqHistory = new double[5];
+    private double[] freqScratch = new double[5];
+    private int freqIndex = 0;
+    private int freqCount = 0;
 
     static {
         System.loadLibrary("tuner");
@@ -41,7 +56,7 @@ class TunerEngine {
         if (running) {
             return;
         }
-        boolean started = nativeStart(sampleRate, WINDOW_SIZE);
+        boolean started = nativeStart(sampleRate, hopSize);
         if (!started) {
             Log.w(TAG, "Native audio engine failed to start");
             return;
@@ -59,18 +74,28 @@ class TunerEngine {
             return;
         }
 
-        double amplitudeDb = computeRmsDb(buffer, read);
-        boolean hasEnergy = amplitudeDb > NOISE_FLOOR_DB;
-        double frequency = hasEnergy ? detectFrequency(buffer, read) : -1;
+        appendToRing(buffer, read);
+        pendingSamples += read;
 
-        if (frequency > 0) {
-            smoothedFrequency = smoothFrequency(frequency);
-        } else {
-            smoothedFrequency = 0;
+        while (ringFilled >= windowSize && pendingSamples >= hopSize) {
+            pendingSamples -= hopSize;
+            fillWindow(analysisBuffer);
+
+            double amplitudeDb = computeRmsDb(analysisBuffer, windowSize);
+            boolean hasEnergy = amplitudeDb > noiseFloorDb;
+            double frequency = hasEnergy ? detectFrequency(analysisBuffer, windowSize) : -1;
+            double filtered = frequency > 0 ? addFrequencySample(frequency) : 0;
+
+            if (filtered > 0) {
+                smoothedFrequency = smoothFrequency(filtered);
+            } else {
+                smoothedFrequency = 0;
+                resetFrequencyHistory();
+            }
+
+            PitchResult result = mapToString(smoothedFrequency, amplitudeDb, filtered > 0 && hasEnergy);
+            listener.onPitch(result);
         }
-
-        PitchResult result = mapToString(smoothedFrequency, amplitudeDb, frequency > 0 && hasEnergy);
-        listener.onPitch(result);
     }
 
     private double computeRmsDb(short[] data, int size) {
@@ -85,9 +110,9 @@ class TunerEngine {
 
     // Core pitch detection: window the buffer, run autocorrelation, then parabolic interpolate.
     private double detectFrequency(short[] data, int size) {
-        int windowSize = Math.min(size, WINDOW_SIZE);
-        double[] samples = new double[windowSize];
-        for (int i = 0; i < windowSize; i++) {
+        int windowedSize = Math.min(size, windowSize);
+        double[] samples = new double[windowedSize];
+        for (int i = 0; i < windowedSize; i++) {
             samples[i] = data[i] * windowCoefficients[i];
         }
 
@@ -100,7 +125,7 @@ class TunerEngine {
 
         for (int lag = minLag; lag <= maxLag; lag++) {
             double sum = 0;
-            int limit = windowSize - lag;
+            int limit = windowedSize - lag;
             for (int i = 0; i < limit; i++) {
                 double delta = samples[i] - samples[i + lag];
                 sum += delta * delta;
@@ -121,10 +146,9 @@ class TunerEngine {
 
         int bestLag = -1;
         double bestValue = Double.MAX_VALUE;
-        double threshold = 0.15;
         for (int lag = minLag; lag <= maxLag; lag++) {
             double value = cmndfScratch[lag];
-            if (value < threshold) {
+            if (value < yinThreshold) {
                 bestLag = lag;
                 bestValue = value;
                 break;
@@ -143,6 +167,10 @@ class TunerEngine {
         double right = bestLag + 1 <= maxLag ? cmndfScratch[bestLag + 1] : bestValue;
         double shift = parabolicShift(left, bestValue, right);
         double refined = bestLag + shift;
+        double maxAccept = Math.min(0.5, yinThreshold * 2.0);
+        if (bestValue > maxAccept) {
+            return -1;
+        }
         if (refined <= 0) {
             return -1;
         }
@@ -157,7 +185,7 @@ class TunerEngine {
 
     private double smoothFrequency(double measured) {
         if (smoothedFrequency == 0) return measured;
-        return smoothedFrequency + SMOOTHING_ALPHA * (measured - smoothedFrequency);
+        return smoothedFrequency + smoothingAlpha * (measured - smoothedFrequency);
     }
 
     private PitchResult mapToString(double freq, double amplitudeDb, boolean hasSignal) {
@@ -196,8 +224,9 @@ class TunerEngine {
     }
 
     private void prepareWindow() {
-        for (int i = 0; i < WINDOW_SIZE; i++) {
-            windowCoefficients[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (WINDOW_SIZE - 1)));
+        windowCoefficients = new double[windowSize];
+        for (int i = 0; i < windowSize; i++) {
+            windowCoefficients[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (windowSize - 1)));
         }
     }
 
@@ -205,6 +234,82 @@ class TunerEngine {
         if (actualSampleRate > 0) {
             sampleRate = actualSampleRate;
         }
+    }
+
+    void applyConfig(@NonNull TunerSettings settings) {
+        windowSize = settings.windowSize;
+        hopSize = Math.max(256, windowSize / 4);
+        smoothingAlpha = settings.smoothingAlpha;
+        noiseFloorDb = settings.noiseFloorDb;
+        yinThreshold = settings.yinThreshold;
+        prepareWindow();
+        diffScratch = null;
+        cmndfScratch = null;
+        ringBuffer = new short[windowSize];
+        analysisBuffer = new short[windowSize];
+        ringWritePos = 0;
+        ringFilled = 0;
+        pendingSamples = 0;
+        freqHistory = new double[5];
+        freqScratch = new double[5];
+        freqIndex = 0;
+        freqCount = 0;
+        smoothedFrequency = 0;
+        stableHits = 0;
+    }
+
+    private void appendToRing(short[] buffer, int read) {
+        for (int i = 0; i < read; i++) {
+            ringBuffer[ringWritePos] = buffer[i];
+            ringWritePos++;
+            if (ringWritePos == windowSize) {
+                ringWritePos = 0;
+            }
+            if (ringFilled < windowSize) {
+                ringFilled++;
+            }
+        }
+    }
+
+    private void fillWindow(short[] out) {
+        int start = ringWritePos - windowSize;
+        if (start < 0) {
+            start += windowSize;
+        }
+        for (int i = 0; i < windowSize; i++) {
+            int idx = start + i;
+            if (idx >= windowSize) {
+                idx -= windowSize;
+            }
+            out[i] = ringBuffer[idx];
+        }
+    }
+
+    private double addFrequencySample(double frequency) {
+        freqHistory[freqIndex] = frequency;
+        freqIndex = (freqIndex + 1) % freqHistory.length;
+        if (freqCount < freqHistory.length) {
+            freqCount++;
+        }
+        return medianFrequency();
+    }
+
+    private double medianFrequency() {
+        if (freqCount == 0) {
+            return 0;
+        }
+        System.arraycopy(freqHistory, 0, freqScratch, 0, freqCount);
+        Arrays.sort(freqScratch, 0, freqCount);
+        int mid = freqCount / 2;
+        if (freqCount % 2 == 1) {
+            return freqScratch[mid];
+        }
+        return (freqScratch[mid - 1] + freqScratch[mid]) / 2.0;
+    }
+
+    private void resetFrequencyHistory() {
+        freqIndex = 0;
+        freqCount = 0;
     }
 
     private native boolean nativeStart(int requestedSampleRate, int framesPerRead);
