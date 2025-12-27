@@ -57,6 +57,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/centsOffset" />
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/deviationChart"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status" />
+
     <ProgressBar
         android:id="@+id/powerMeter"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -68,6 +77,6 @@
         android:progressTint="@color/purple_500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/status" />
+        app:layout_constraintTop_toBottomOf="@id/deviationChart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

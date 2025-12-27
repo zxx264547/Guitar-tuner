@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.tuner.R;
+import com.github.mikephil.charting.charts.LineChart;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -22,6 +23,9 @@ public final class ActivityMainBinding implements ViewBinding {
 
   @NonNull
   public final TextView centsOffset;
+
+  @NonNull
+  public final LineChart deviationChart;
 
   @NonNull
   public final TextView frequency;
@@ -39,10 +43,12 @@ public final class ActivityMainBinding implements ViewBinding {
   public final TextView title;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull TextView centsOffset,
-      @NonNull TextView frequency, @NonNull ProgressBar powerMeter, @NonNull TextView status,
-      @NonNull TextView stringName, @NonNull TextView title) {
+      @NonNull LineChart deviationChart, @NonNull TextView frequency,
+      @NonNull ProgressBar powerMeter, @NonNull TextView status, @NonNull TextView stringName,
+      @NonNull TextView title) {
     this.rootView = rootView;
     this.centsOffset = centsOffset;
+    this.deviationChart = deviationChart;
     this.frequency = frequency;
     this.powerMeter = powerMeter;
     this.status = status;
@@ -83,6 +89,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.deviationChart;
+      LineChart deviationChart = ViewBindings.findChildViewById(rootView, id);
+      if (deviationChart == null) {
+        break missingId;
+      }
+
       id = R.id.frequency;
       TextView frequency = ViewBindings.findChildViewById(rootView, id);
       if (frequency == null) {
@@ -113,8 +125,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, centsOffset, frequency,
-          powerMeter, status, stringName, title);
+      return new ActivityMainBinding((ConstraintLayout) rootView, centsOffset, deviationChart,
+          frequency, powerMeter, status, stringName, title);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

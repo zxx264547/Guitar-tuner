@@ -59,4 +59,5 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.oboe:oboe:1.7.0")
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
 }
