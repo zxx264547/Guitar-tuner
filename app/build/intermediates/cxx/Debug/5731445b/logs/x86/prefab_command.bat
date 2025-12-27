@@ -1,0 +1,20 @@
+@echo off
+"E:\\AndroidStudio\\jbr\\bin\\java" ^
+  --class-path ^
+  "C:\\Users\\Administrator\\.gradle\\caches\\modules-2\\files-2.1\\com.google.prefab\\cli\\2.0.0\\f2702b5ca13df54e3ca92f29d6b403fb6285d8df\\cli-2.0.0-all.jar" ^
+  com.google.prefab.cli.AppKt ^
+  --build-system ^
+  cmake ^
+  --platform ^
+  android ^
+  --abi ^
+  x86 ^
+  --os-version ^
+  24 ^
+  --stl ^
+  c++_shared ^
+  --ndk-version ^
+  25 ^
+  --output ^
+  "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agp-prefab-staging2473065450573528246\\staged-cli-output" ^
+  "C:\\Users\\Administrator\\.gradle\\caches\\8.9\\transforms\\57d1efb4069e1c11f03fe5f35f5a9859\\transformed\\oboe-1.7.0\\prefab"

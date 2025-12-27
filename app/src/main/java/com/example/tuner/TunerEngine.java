@@ -1,13 +1,6 @@
 package com.example.tuner;
 
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.os.Build;
 import android.util.Log;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class TunerEngine {
 
@@ -16,7 +9,6 @@ class TunerEngine {
     }
 
     private static final String TAG = "TunerEngine";
-    private static final int SAMPLE_RATE = 44100;
     private static final int WINDOW_SIZE = 4096;
     private static final double MIN_FREQ = 70.0;    // lower than low E to keep margin
     private static final double MAX_FREQ = 1300.0;  // upper bound to avoid octave errors
@@ -27,14 +19,18 @@ class TunerEngine {
     private static final double[] STRING_FREQ = {82.4069, 110.0, 146.832, 195.998, 246.942, 329.628};
 
     private final Listener listener;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private AudioRecord audioRecord;
     private volatile boolean running;
+    private int sampleRate = 44100;
     private double smoothedFrequency = 0;
     private int stableHits = 0;
     private double[] windowCoefficients = new double[WINDOW_SIZE];
-    private double[] autocorrScratch;
+    private double[] diffScratch;
+    private double[] cmndfScratch;
+
+    static {
+        System.loadLibrary("tuner");
+    }
 
     TunerEngine(Listener listener) {
         this.listener = listener;
@@ -42,85 +38,39 @@ class TunerEngine {
     }
 
     void start() {
-        if (running) return;
-
-        int minBuffer = AudioRecord.getMinBufferSize(
-                SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
-        if (minBuffer == AudioRecord.ERROR || minBuffer == AudioRecord.ERROR_BAD_VALUE) {
-            Log.w(TAG, "Unable to get buffer size");
+        if (running) {
             return;
         }
-
-        int bufferSize = Math.max(minBuffer, WINDOW_SIZE * 2);
-        int source = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                ? MediaRecorder.AudioSource.UNPROCESSED
-                : MediaRecorder.AudioSource.DEFAULT;
-
-        audioRecord = new AudioRecord(
-                source,
-                SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
-                bufferSize);
-
-        if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-            Log.w(TAG, "AudioRecord failed with UNPROCESSED, retry DEFAULT");
-            audioRecord.release();
-            audioRecord = new AudioRecord(
-                    MediaRecorder.AudioSource.DEFAULT,
-                    SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    bufferSize);
-        }
-
-        if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-            Log.w(TAG, "AudioRecord still failed to init");
-            audioRecord.release();
-            audioRecord = null;
+        boolean started = nativeStart(sampleRate, WINDOW_SIZE);
+        if (!started) {
+            Log.w(TAG, "Native audio engine failed to start");
             return;
         }
-
         running = true;
-        executor.submit(this::captureLoop);
     }
 
     void stop() {
         running = false;
-        if (audioRecord != null) {
-            try {
-                audioRecord.stop();
-            } catch (IllegalStateException ignored) {
-            }
-            audioRecord.release();
-            audioRecord = null;
-        }
+        nativeStop();
     }
 
-    private void captureLoop() {
-        if (audioRecord == null) return;
-        short[] buffer = new short[WINDOW_SIZE];
-        audioRecord.startRecording();
-
-        while (running) {
-            int read = audioRecord.read(buffer, 0, buffer.length, AudioRecord.READ_BLOCKING);
-            if (read <= 0) continue;
-
-            double amplitudeDb = computeRmsDb(buffer, read);
-            boolean hasEnergy = amplitudeDb > NOISE_FLOOR_DB;
-            double frequency = hasEnergy ? detectFrequency(buffer, read) : -1;
-
-            if (frequency > 0) {
-                smoothedFrequency = smoothFrequency(frequency);
-            } else {
-                smoothedFrequency = 0;
-            }
-
-            PitchResult result = mapToString(smoothedFrequency, amplitudeDb, frequency > 0 && hasEnergy);
-            listener.onPitch(result);
+    private void onPcm(short[] buffer, int read) {
+        if (!running || read <= 0) {
+            return;
         }
+
+        double amplitudeDb = computeRmsDb(buffer, read);
+        boolean hasEnergy = amplitudeDb > NOISE_FLOOR_DB;
+        double frequency = hasEnergy ? detectFrequency(buffer, read) : -1;
+
+        if (frequency > 0) {
+            smoothedFrequency = smoothFrequency(frequency);
+        } else {
+            smoothedFrequency = 0;
+        }
+
+        PitchResult result = mapToString(smoothedFrequency, amplitudeDb, frequency > 0 && hasEnergy);
+        listener.onPitch(result);
     }
 
     private double computeRmsDb(short[] data, int size) {
@@ -141,38 +91,62 @@ class TunerEngine {
             samples[i] = data[i] * windowCoefficients[i];
         }
 
-        int minLag = (int) (SAMPLE_RATE / MAX_FREQ);
-        int maxLag = (int) (SAMPLE_RATE / MIN_FREQ);
-        if (autocorrScratch == null || autocorrScratch.length < maxLag + 1) {
-            autocorrScratch = new double[maxLag + 1];
+        int minLag = (int) (sampleRate / MAX_FREQ);
+        int maxLag = (int) (sampleRate / MIN_FREQ);
+        if (diffScratch == null || diffScratch.length < maxLag + 1) {
+            diffScratch = new double[maxLag + 1];
+            cmndfScratch = new double[maxLag + 1];
         }
-
-        double best = Double.NEGATIVE_INFINITY;
-        int bestLag = -1;
 
         for (int lag = minLag; lag <= maxLag; lag++) {
             double sum = 0;
             int limit = windowSize - lag;
             for (int i = 0; i < limit; i++) {
-                sum += samples[i] * samples[i + lag];
+                double delta = samples[i] - samples[i + lag];
+                sum += delta * delta;
             }
-            sum /= limit; // normalize to reduce preference for shorter lags
-            autocorrScratch[lag] = sum;
+            diffScratch[lag] = sum;
+        }
 
-            if (sum > best) {
-                best = sum;
+        cmndfScratch[minLag] = 1;
+        double runningSum = 0;
+        for (int lag = minLag + 1; lag <= maxLag; lag++) {
+            runningSum += diffScratch[lag];
+            if (runningSum == 0) {
+                cmndfScratch[lag] = 1;
+            } else {
+                cmndfScratch[lag] = diffScratch[lag] * lag / runningSum;
+            }
+        }
+
+        int bestLag = -1;
+        double bestValue = Double.MAX_VALUE;
+        double threshold = 0.15;
+        for (int lag = minLag; lag <= maxLag; lag++) {
+            double value = cmndfScratch[lag];
+            if (value < threshold) {
+                bestLag = lag;
+                bestValue = value;
+                break;
+            }
+            if (value < bestValue) {
+                bestValue = value;
                 bestLag = lag;
             }
         }
 
-        if (bestLag <= 0) return -1;
+        if (bestLag <= 0) {
+            return -1;
+        }
 
-        double left = bestLag > minLag ? autocorrScratch[bestLag - 1] : best;
-        double right = bestLag + 1 <= maxLag ? autocorrScratch[bestLag + 1] : best;
-        double shift = parabolicShift(left, best, right);
+        double left = bestLag > minLag ? cmndfScratch[bestLag - 1] : bestValue;
+        double right = bestLag + 1 <= maxLag ? cmndfScratch[bestLag + 1] : bestValue;
+        double shift = parabolicShift(left, bestValue, right);
         double refined = bestLag + shift;
-        if (refined <= 0) return -1;
-        return SAMPLE_RATE / refined;
+        if (refined <= 0) {
+            return -1;
+        }
+        return sampleRate / refined;
     }
 
     private double parabolicShift(double left, double center, double right) {
@@ -226,4 +200,13 @@ class TunerEngine {
             windowCoefficients[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (WINDOW_SIZE - 1)));
         }
     }
+
+    private void onStreamConfig(int actualSampleRate) {
+        if (actualSampleRate > 0) {
+            sampleRate = actualSampleRate;
+        }
+    }
+
+    private native boolean nativeStart(int requestedSampleRate, int framesPerRead);
+    private native void nativeStop();
 }

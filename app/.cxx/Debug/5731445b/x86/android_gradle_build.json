@@ -1,0 +1,40 @@
+{
+  "buildFiles": [
+    "F:\\AndroidStudioProjects\\Guitar-tuner\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "F:\\SDK\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "F:\\AndroidStudioProjects\\Guitar-tuner\\app\\.cxx\\Debug\\5731445b\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "F:\\SDK\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "F:\\AndroidStudioProjects\\Guitar-tuner\\app\\.cxx\\Debug\\5731445b\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "tuner::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "tuner",
+      "output": "F:\\AndroidStudioProjects\\Guitar-tuner\\app\\build\\intermediates\\cxx\\Debug\\5731445b\\obj\\x86\\libtuner.so",
+      "runtimeFiles": [
+        "C:\\Users\\Administrator\\.gradle\\caches\\8.9\\transforms\\57d1efb4069e1c11f03fe5f35f5a9859\\transformed\\oboe-1.7.0\\prefab\\modules\\oboe\\libs\\android.x86\\liboboe.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "F:\\SDK\\ndk\\25.1.8937393\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "F:\\SDK\\ndk\\25.1.8937393\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
