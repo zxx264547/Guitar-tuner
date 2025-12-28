@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 
 import com.example.tuner.databinding.ActivityAlgorithmSettingsBinding;
 import com.google.android.material.slider.Slider;
@@ -17,6 +18,7 @@ public class AlgorithmSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityAlgorithmSettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

@@ -7,6 +7,7 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 
 import com.example.tuner.databinding.ActivityTuningSettingsBinding;
 
@@ -19,6 +20,7 @@ public class TuningSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityTuningSettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
