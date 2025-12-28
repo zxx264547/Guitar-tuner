@@ -1,3 +1,0 @@
-ninja: Entering directory `F:\AndroidStudioProjects\Guitar-tuner\app\.cxx\Debug\5731445b\x86'
-[1/2] Building CXX object CMakeFiles/tuner.dir/tuner_jni.cpp.o
-[2/2] Linking CXX shared library F:\AndroidStudioProjects\Guitar-tuner\app\build\intermediates\cxx\Debug\5731445b\obj\x86\libtuner.so

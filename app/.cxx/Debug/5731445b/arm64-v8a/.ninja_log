@@ -1,3 +1,4 @@
 # ninja log v5
 0	556	7885542184353232	CMakeFiles/tuner.dir/tuner_jni.cpp.o	658321be26bce8b4
 558	671	7885542185484195	F:/AndroidStudioProjects/Guitar-tuner/app/build/intermediates/cxx/Debug/5731445b/obj/arm64-v8a/libtuner.so	fb6c5b736292c343
+2	171	7885928899677085	F:/AndroidStudioProjects/Guitar-tuner/app/build/intermediates/cxx/Debug/5731445b/obj/arm64-v8a/libtuner.so	fb6c5b736292c343
