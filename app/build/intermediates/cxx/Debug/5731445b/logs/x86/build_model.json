@@ -27,10 +27,7 @@
     "variantName": "debug",
     "isDebuggableEnabled": true,
     "validAbiList": [
-      "armeabi-v7a",
-      "arm64-v8a",
-      "x86",
-      "x86_64"
+      "x86"
     ],
     "buildTargetSet": [],
     "implicitBuildTargetSet": [],
@@ -142,6 +139,7 @@
         "rootBuildGradleFolder": "F:\\AndroidStudioProjects\\Guitar-tuner",
         "sdkFolder": "F:\\SDK",
         "isBuildOnlyTargetAbiEnabled": true,
+        "ideBuildTargetAbi": "x86",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": true
       },

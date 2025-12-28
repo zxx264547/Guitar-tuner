@@ -15,6 +15,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/openSettings"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置"
+        app:layout_constraintBaseline_toBaselineOf="@id/title"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/stringName"
         android:layout_width="wrap_content"
@@ -65,149 +74,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/status" />
-
-    <LinearLayout
-        android:id="@+id/settingsPanel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviationChart">
-
-        <TextView
-            android:id="@+id/settingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="参数设置"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/labelWindowSize"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="窗口大小" />
-
-            <TextView
-                android:id="@+id/valueWindowSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="8192" />
-        </LinearLayout>
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sliderWindowSize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:valueFrom="0"
-            android:valueTo="3"
-            android:stepSize="1" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/labelSmoothing"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="平滑系数" />
-
-            <TextView
-                android:id="@+id/valueSmoothing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.10" />
-        </LinearLayout>
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sliderSmoothing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:valueFrom="0.05"
-            android:valueTo="0.5"
-            android:stepSize="0.01" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/labelNoiseFloor"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="噪声门限(dB)" />
-
-            <TextView
-                android:id="@+id/valueNoiseFloor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-50.0" />
-        </LinearLayout>
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sliderNoiseFloor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:valueFrom="-80"
-            android:valueTo="-20"
-            android:stepSize="1" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/labelYinThreshold"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="YIN 阈值" />
-
-            <TextView
-                android:id="@+id/valueYinThreshold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.15" />
-        </LinearLayout>
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sliderYinThreshold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:valueFrom="0.05"
-            android:valueTo="0.3"
-            android:stepSize="0.01" />
-    </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/powerMeter"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="8dp"
-        android:layout_marginTop="16dp"
-        android:max="100"
-        android:progress="0"
-        android:progressTint="@color/purple_500"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsPanel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

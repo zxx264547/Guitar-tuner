@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-25:12
-INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-25:12
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-37:12
+INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-37:12
+INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-37:12
+INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:2:1-37:12
 MERGED from [androidx.databinding:viewbinding:8.2.2] C:\Users\Administrator\.gradle\caches\8.9\transforms\b4451b9046cb991a992b532abe0a9ec9\transformed\viewbinding-8.2.2\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Administrator\.gradle\caches\8.9\transforms\41d6d5345bc911b6fa4430e7020433db\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\Administrator\.gradle\caches\8.9\transforms\2790330cbe43cfa818941590808cac4b\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
@@ -61,8 +61,8 @@ ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xm
 	android:name
 		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:4:22-68
 application
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:6:5-23:19
-INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:6:5-23:19
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:6:5-35:19
+INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:6:5-35:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Administrator\.gradle\caches\8.9\transforms\41d6d5345bc911b6fa4430e7020433db\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\Administrator\.gradle\caches\8.9\transforms\41d6d5345bc911b6fa4430e7020433db\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\Administrator\.gradle\caches\8.9\transforms\2790330cbe43cfa818941590808cac4b\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
@@ -95,24 +95,48 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Administrator\.gra
 		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:7:9-35
 	android:theme
 		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:12:9-43
-activity#com.example.tuner.MainActivity
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:13:9-22:20
+activity#com.example.tuner.AlgorithmSettingsActivity
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:13:9-16:36
 	android:label
-		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:16:13-45
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:16:13-33
 	android:exported
-		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:15:13-36
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:15:13-37
 	android:name
-		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:14:13-41
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:14:13-54
+activity#com.example.tuner.SettingsActivity
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:17:9-20:36
+	android:label
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:20:13-33
+	android:exported
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:19:13-37
+	android:name
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:18:13-45
+activity#com.example.tuner.TuningSettingsActivity
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:21:9-24:36
+	android:label
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:24:13-33
+	android:exported
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:23:13-37
+	android:name
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:22:13-51
+activity#com.example.tuner.MainActivity
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:25:9-34:20
+	android:label
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:28:13-45
+	android:exported
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:27:13-36
+	android:name
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:26:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:17:13-21:29
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:29:13-33:29
 action#android.intent.action.MAIN
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:18:17-69
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:30:17-69
 	android:name
-		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:18:25-66
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:30:25-66
 category#android.intent.category.LAUNCHER
-ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:20:17-77
+ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:32:17-77
 	android:name
-		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:20:27-74
+		ADDED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml:32:27-74
 uses-sdk
 INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from F:\AndroidStudioProjects\Guitar-tuner\app\src\main\AndroidManifest.xml

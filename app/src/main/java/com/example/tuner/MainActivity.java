@@ -2,6 +2,7 @@ package com.example.tuner;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 
@@ -12,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.tuner.databinding.ActivityMainBinding;
-import com.google.android.material.slider.Slider;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
         neutralColor = binding.centsOffset.getCurrentTextColor();
         setupChart(binding.deviationChart);
         loadSettings();
-        initSliders();
+        binding.openSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class)));
 
         permissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
     @Override
     protected void onResume() {
         super.onResume();
+        loadSettings();
         ensurePermission();
     }
 
@@ -127,103 +129,15 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
         }
 
         appendDeviation(result);
-        int level = (int) Math.max(0, Math.min(100, (result.amplitudeDb + 60) * 2));
-        binding.powerMeter.setProgress(level);
     }
 
     private void loadSettings() {
         currentSettings = TunerSettings.load(this);
-        tunerEngine.applyConfig(currentSettings);
-    }
-
-    private void applySettings(TunerSettings updated) {
-        currentSettings = updated;
-        currentSettings.save(this);
         tunerEngine.stop();
         tunerEngine.applyConfig(currentSettings);
         if (isTunerRunning) {
             tunerEngine.start();
         }
-    }
-
-    private void initSliders() {
-        binding.labelWindowSize.setText("窗口大小（推荐 16384）");
-        binding.labelSmoothing.setText("平滑系数（推荐 0.08）");
-        binding.labelNoiseFloor.setText("噪声门限(dB)（推荐 -50）");
-        binding.labelYinThreshold.setText("YIN 阈值（推荐 0.12）");
-
-        int windowIndex = windowIndex(currentSettings.windowSize);
-        binding.sliderWindowSize.setValue(windowIndex);
-        binding.valueWindowSize.setText(String.valueOf(currentSettings.windowSize));
-        binding.sliderWindowSize.addOnChangeListener((slider, value, fromUser) -> {
-            int size = TunerSettings.WINDOW_OPTIONS[(int) value];
-            binding.valueWindowSize.setText(String.valueOf(size));
-        });
-        binding.sliderWindowSize.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                int size = TunerSettings.WINDOW_OPTIONS[(int) slider.getValue()];
-                applySettings(currentSettings.withWindowSize(size));
-            }
-        });
-
-        binding.sliderSmoothing.setValue((float) currentSettings.smoothingAlpha);
-        binding.valueSmoothing.setText(String.format("%.2f", currentSettings.smoothingAlpha));
-        binding.sliderSmoothing.addOnChangeListener((slider, value, fromUser) ->
-                binding.valueSmoothing.setText(String.format("%.2f", value)));
-        binding.sliderSmoothing.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                applySettings(currentSettings.withSmoothingAlpha(slider.getValue()));
-            }
-        });
-
-        binding.sliderNoiseFloor.setValue((float) currentSettings.noiseFloorDb);
-        binding.valueNoiseFloor.setText(String.format("%.1f", currentSettings.noiseFloorDb));
-        binding.sliderNoiseFloor.addOnChangeListener((slider, value, fromUser) ->
-                binding.valueNoiseFloor.setText(String.format("%.1f", value)));
-        binding.sliderNoiseFloor.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                applySettings(currentSettings.withNoiseFloorDb(slider.getValue()));
-            }
-        });
-
-        binding.sliderYinThreshold.setValue((float) currentSettings.yinThreshold);
-        binding.valueYinThreshold.setText(String.format("%.2f", currentSettings.yinThreshold));
-        binding.sliderYinThreshold.addOnChangeListener((slider, value, fromUser) ->
-                binding.valueYinThreshold.setText(String.format("%.2f", value)));
-        binding.sliderYinThreshold.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                applySettings(currentSettings.withYinThreshold(slider.getValue()));
-            }
-        });
-    }
-
-    private int windowIndex(int windowSize) {
-        for (int i = 0; i < TunerSettings.WINDOW_OPTIONS.length; i++) {
-            if (TunerSettings.WINDOW_OPTIONS[i] == windowSize) {
-                return i;
-            }
-        }
-        return 3;
     }
 
     private void setupChart(@NonNull LineChart chart) {

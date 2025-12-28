@@ -4,8 +4,6 @@ package com.example.tuner.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,7 +12,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.tuner.R;
 import com.github.mikephil.charting.charts.LineChart;
-import com.google.android.material.slider.Slider;
+import com.google.android.material.button.MaterialButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -33,37 +31,7 @@ public final class ActivityMainBinding implements ViewBinding {
   public final TextView frequency;
 
   @NonNull
-  public final TextView labelNoiseFloor;
-
-  @NonNull
-  public final TextView labelSmoothing;
-
-  @NonNull
-  public final TextView labelWindowSize;
-
-  @NonNull
-  public final TextView labelYinThreshold;
-
-  @NonNull
-  public final ProgressBar powerMeter;
-
-  @NonNull
-  public final LinearLayout settingsPanel;
-
-  @NonNull
-  public final TextView settingsTitle;
-
-  @NonNull
-  public final Slider sliderNoiseFloor;
-
-  @NonNull
-  public final Slider sliderSmoothing;
-
-  @NonNull
-  public final Slider sliderWindowSize;
-
-  @NonNull
-  public final Slider sliderYinThreshold;
+  public final MaterialButton openSettings;
 
   @NonNull
   public final TextView status;
@@ -74,50 +42,18 @@ public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   public final TextView title;
 
-  @NonNull
-  public final TextView valueNoiseFloor;
-
-  @NonNull
-  public final TextView valueSmoothing;
-
-  @NonNull
-  public final TextView valueWindowSize;
-
-  @NonNull
-  public final TextView valueYinThreshold;
-
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull TextView centsOffset,
       @NonNull LineChart deviationChart, @NonNull TextView frequency,
-      @NonNull TextView labelNoiseFloor, @NonNull TextView labelSmoothing,
-      @NonNull TextView labelWindowSize, @NonNull TextView labelYinThreshold,
-      @NonNull ProgressBar powerMeter, @NonNull LinearLayout settingsPanel,
-      @NonNull TextView settingsTitle, @NonNull Slider sliderNoiseFloor,
-      @NonNull Slider sliderSmoothing, @NonNull Slider sliderWindowSize,
-      @NonNull Slider sliderYinThreshold, @NonNull TextView status, @NonNull TextView stringName,
-      @NonNull TextView title, @NonNull TextView valueNoiseFloor, @NonNull TextView valueSmoothing,
-      @NonNull TextView valueWindowSize, @NonNull TextView valueYinThreshold) {
+      @NonNull MaterialButton openSettings, @NonNull TextView status, @NonNull TextView stringName,
+      @NonNull TextView title) {
     this.rootView = rootView;
     this.centsOffset = centsOffset;
     this.deviationChart = deviationChart;
     this.frequency = frequency;
-    this.labelNoiseFloor = labelNoiseFloor;
-    this.labelSmoothing = labelSmoothing;
-    this.labelWindowSize = labelWindowSize;
-    this.labelYinThreshold = labelYinThreshold;
-    this.powerMeter = powerMeter;
-    this.settingsPanel = settingsPanel;
-    this.settingsTitle = settingsTitle;
-    this.sliderNoiseFloor = sliderNoiseFloor;
-    this.sliderSmoothing = sliderSmoothing;
-    this.sliderWindowSize = sliderWindowSize;
-    this.sliderYinThreshold = sliderYinThreshold;
+    this.openSettings = openSettings;
     this.status = status;
     this.stringName = stringName;
     this.title = title;
-    this.valueNoiseFloor = valueNoiseFloor;
-    this.valueSmoothing = valueSmoothing;
-    this.valueWindowSize = valueWindowSize;
-    this.valueYinThreshold = valueYinThreshold;
   }
 
   @Override
@@ -165,69 +101,9 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.labelNoiseFloor;
-      TextView labelNoiseFloor = ViewBindings.findChildViewById(rootView, id);
-      if (labelNoiseFloor == null) {
-        break missingId;
-      }
-
-      id = R.id.labelSmoothing;
-      TextView labelSmoothing = ViewBindings.findChildViewById(rootView, id);
-      if (labelSmoothing == null) {
-        break missingId;
-      }
-
-      id = R.id.labelWindowSize;
-      TextView labelWindowSize = ViewBindings.findChildViewById(rootView, id);
-      if (labelWindowSize == null) {
-        break missingId;
-      }
-
-      id = R.id.labelYinThreshold;
-      TextView labelYinThreshold = ViewBindings.findChildViewById(rootView, id);
-      if (labelYinThreshold == null) {
-        break missingId;
-      }
-
-      id = R.id.powerMeter;
-      ProgressBar powerMeter = ViewBindings.findChildViewById(rootView, id);
-      if (powerMeter == null) {
-        break missingId;
-      }
-
-      id = R.id.settingsPanel;
-      LinearLayout settingsPanel = ViewBindings.findChildViewById(rootView, id);
-      if (settingsPanel == null) {
-        break missingId;
-      }
-
-      id = R.id.settingsTitle;
-      TextView settingsTitle = ViewBindings.findChildViewById(rootView, id);
-      if (settingsTitle == null) {
-        break missingId;
-      }
-
-      id = R.id.sliderNoiseFloor;
-      Slider sliderNoiseFloor = ViewBindings.findChildViewById(rootView, id);
-      if (sliderNoiseFloor == null) {
-        break missingId;
-      }
-
-      id = R.id.sliderSmoothing;
-      Slider sliderSmoothing = ViewBindings.findChildViewById(rootView, id);
-      if (sliderSmoothing == null) {
-        break missingId;
-      }
-
-      id = R.id.sliderWindowSize;
-      Slider sliderWindowSize = ViewBindings.findChildViewById(rootView, id);
-      if (sliderWindowSize == null) {
-        break missingId;
-      }
-
-      id = R.id.sliderYinThreshold;
-      Slider sliderYinThreshold = ViewBindings.findChildViewById(rootView, id);
-      if (sliderYinThreshold == null) {
+      id = R.id.openSettings;
+      MaterialButton openSettings = ViewBindings.findChildViewById(rootView, id);
+      if (openSettings == null) {
         break missingId;
       }
 
@@ -249,35 +125,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.valueNoiseFloor;
-      TextView valueNoiseFloor = ViewBindings.findChildViewById(rootView, id);
-      if (valueNoiseFloor == null) {
-        break missingId;
-      }
-
-      id = R.id.valueSmoothing;
-      TextView valueSmoothing = ViewBindings.findChildViewById(rootView, id);
-      if (valueSmoothing == null) {
-        break missingId;
-      }
-
-      id = R.id.valueWindowSize;
-      TextView valueWindowSize = ViewBindings.findChildViewById(rootView, id);
-      if (valueWindowSize == null) {
-        break missingId;
-      }
-
-      id = R.id.valueYinThreshold;
-      TextView valueYinThreshold = ViewBindings.findChildViewById(rootView, id);
-      if (valueYinThreshold == null) {
-        break missingId;
-      }
-
       return new ActivityMainBinding((ConstraintLayout) rootView, centsOffset, deviationChart,
-          frequency, labelNoiseFloor, labelSmoothing, labelWindowSize, labelYinThreshold,
-          powerMeter, settingsPanel, settingsTitle, sliderNoiseFloor, sliderSmoothing,
-          sliderWindowSize, sliderYinThreshold, status, stringName, title, valueNoiseFloor,
-          valueSmoothing, valueWindowSize, valueYinThreshold);
+          frequency, openSettings, status, stringName, title);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

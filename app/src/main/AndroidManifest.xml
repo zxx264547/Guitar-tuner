@@ -11,6 +11,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tuner">
         <activity
+            android:name=".AlgorithmSettingsActivity"
+            android:exported="false"
+            android:label="算法参数" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="参数设置" />
+        <activity
+            android:name=".TuningSettingsActivity"
+            android:exported="false"
+            android:label="特殊调弦" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name">

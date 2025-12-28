@@ -16,9 +16,6 @@ class TunerEngine {
     private static final double MIN_FREQ = 70.0;    // lower than low E to keep margin
     private static final double MAX_FREQ = 1300.0;  // upper bound to avoid octave errors
 
-    private static final String[] GUITAR_STRINGS = {"E2", "A2", "D3", "G3", "B3", "E4"};
-    private static final double[] STRING_FREQ = {82.4069, 110.0, 146.832, 195.998, 246.942, 329.628};
-
     private final Listener listener;
 
     private volatile boolean running;
@@ -42,6 +39,8 @@ class TunerEngine {
     private double[] freqScratch = new double[5];
     private int freqIndex = 0;
     private int freqCount = 0;
+    private String[] stringLabels = {"E2", "A2", "D3", "G3", "B3", "E4"};
+    private double[] stringFrequencies = {82.4069, 110.0, 146.832, 195.998, 246.942, 329.628};
 
     static {
         System.loadLibrary("tuner");
@@ -198,8 +197,8 @@ class TunerEngine {
         double bestDiff = Double.MAX_VALUE;
         double cents = 0;
 
-        for (int i = 0; i < STRING_FREQ.length; i++) {
-            double diffCents = 1200 * log2(freq / STRING_FREQ[i]);
+        for (int i = 0; i < stringFrequencies.length; i++) {
+            double diffCents = 1200 * log2(freq / stringFrequencies[i]);
             double abs = Math.abs(diffCents);
             if (abs < bestDiff) {
                 bestDiff = abs;
@@ -216,7 +215,7 @@ class TunerEngine {
         }
         boolean stable = stableHits > 2;
 
-        return new PitchResult(true, freq, cents, GUITAR_STRINGS[bestIndex], amplitudeDb, stable);
+        return new PitchResult(true, freq, cents, stringLabels[bestIndex], amplitudeDb, stable);
     }
 
     private double log2(double value) {
@@ -242,6 +241,8 @@ class TunerEngine {
         smoothingAlpha = settings.smoothingAlpha;
         noiseFloorDb = settings.noiseFloorDb;
         yinThreshold = settings.yinThreshold;
+        stringLabels = settings.stringNotes;
+        stringFrequencies = settings.stringFrequencies;
         prepareWindow();
         diffScratch = null;
         cmndfScratch = null;
