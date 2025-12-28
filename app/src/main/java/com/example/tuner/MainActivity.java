@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowCompat;
 
 import com.example.tuner.databinding.ActivityMainBinding;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
     private long chartStartMs = 0;
     private TunerSettings currentSettings;
     private boolean isTunerRunning = false;
+    private boolean hasShownAudioApiDialog = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        applyEdgeInsets(binding.getRoot());
 
         tunerEngine = new TunerEngine(this);
         neutralColor = binding.centsOffset.getCurrentTextColor();
@@ -105,6 +109,17 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
         runOnUiThread(() -> renderResult(result));
     }
 
+    @Override
+    public void onAudioApiUsed(boolean isAAudio) {
+        if (!isAAudio || hasShownAudioApiDialog) {
+            return;
+        }
+        hasShownAudioApiDialog = true;
+        runOnUiThread(() ->
+                android.widget.Toast.makeText(this, "当前录音使用 AAudio。", android.widget.Toast.LENGTH_SHORT)
+                        .show());
+    }
+
     private void renderResult(@NonNull PitchResult result) {
         if (!result.hasSignal) {
             binding.stringName.setText(getString(R.string.listening));
@@ -140,6 +155,18 @@ public class MainActivity extends AppCompatActivity implements TunerEngine.Liste
         if (isTunerRunning) {
             tunerEngine.start();
         }
+    }
+
+    private void applyEdgeInsets(@NonNull android.view.View root) {
+        int baseTop = root.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            int topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            view.setPadding(view.getPaddingLeft(),
+                    baseTop + topInset,
+                    view.getPaddingRight(),
+                    view.getPaddingBottom());
+            return insets;
+        });
     }
 
     private void setupChart(@NonNull LineChart chart) {

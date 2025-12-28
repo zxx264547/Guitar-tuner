@@ -17,6 +17,7 @@ struct RecorderState {
     jobject engine = nullptr;
     jmethodID onPcm = nullptr;
     jmethodID onStreamConfig = nullptr;
+    jmethodID onAudioApi = nullptr;
     std::shared_ptr<oboe::AudioStream> stream;
     std::thread thread;
     std::atomic<bool> running{false};
@@ -63,6 +64,14 @@ void notifyStreamConfig(JNIEnv *env) {
     env->CallVoidMethod(gState.engine, gState.onStreamConfig, actualRate);
 }
 
+void notifyAudioApi(JNIEnv *env) {
+    if (gState.engine == nullptr || gState.onAudioApi == nullptr || gState.stream == nullptr) {
+        return;
+    }
+    int api = gState.stream->getAudioApi() == oboe::AudioApi::AAudio ? 1 : 0;
+    env->CallVoidMethod(gState.engine, gState.onAudioApi, static_cast<jint>(api));
+}
+
 void readLoop() {
     JNIEnv *env = nullptr;
     if (gState.vm->AttachCurrentThread(&env, nullptr) != JNI_OK) {
@@ -71,6 +80,7 @@ void readLoop() {
     }
 
     notifyStreamConfig(env);
+    notifyAudioApi(env);
 
     std::vector<int16_t> buffer(static_cast<size_t>(gState.framesPerRead));
 
@@ -118,8 +128,9 @@ bool ensureJniRefs(JNIEnv *env, jobject thiz) {
         }
         gState.onPcm = env->GetMethodID(cls, "onPcm", "([SI)V");
         gState.onStreamConfig = env->GetMethodID(cls, "onStreamConfig", "(I)V");
+        gState.onAudioApi = env->GetMethodID(cls, "onAudioApi", "(I)V");
         env->DeleteLocalRef(cls);
-        if (!gState.onPcm || !gState.onStreamConfig) {
+        if (!gState.onPcm || !gState.onStreamConfig || !gState.onAudioApi) {
             logWarning("Failed to resolve JNI methods");
             return false;
         }
@@ -182,4 +193,5 @@ Java_com_example_tuner_TunerEngine_nativeStop(JNIEnv *env, jobject /*thiz*/) {
     }
     gState.onPcm = nullptr;
     gState.onStreamConfig = nullptr;
+    gState.onAudioApi = nullptr;
 }

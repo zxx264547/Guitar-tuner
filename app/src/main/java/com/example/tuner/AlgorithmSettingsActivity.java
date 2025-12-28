@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowCompat;
 
 import com.example.tuner.databinding.ActivityAlgorithmSettingsBinding;
@@ -21,6 +23,7 @@ public class AlgorithmSettingsActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityAlgorithmSettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        applyEdgeInsets(binding.getRoot());
 
         currentSettings = TunerSettings.load(this);
         setupSliders();
@@ -137,6 +140,18 @@ public class AlgorithmSettingsActivity extends AppCompatActivity {
     private void applySettings(@NonNull TunerSettings updated) {
         currentSettings = updated;
         currentSettings.save(this);
+    }
+
+    private void applyEdgeInsets(android.view.View root) {
+        int baseTop = root.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            int topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            view.setPadding(view.getPaddingLeft(),
+                    baseTop + topInset,
+                    view.getPaddingRight(),
+                    view.getPaddingBottom());
+            return insets;
+        });
     }
 
     private int windowIndex(int windowSize) {

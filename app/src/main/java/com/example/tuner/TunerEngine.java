@@ -10,6 +10,7 @@ class TunerEngine {
 
     interface Listener {
         void onPitch(PitchResult result);
+        void onAudioApiUsed(boolean isAAudio);
     }
 
     private static final String TAG = "TunerEngine";
@@ -25,6 +26,11 @@ class TunerEngine {
     private double smoothingAlpha = 0.1;
     private double noiseFloorDb = -50.0;
     private double yinThreshold = 0.15;
+    private double noiseEstimateDb = -70.0;
+    private double noiseEstimateAlpha = 0.05;
+    private double noiseMarginDb = 6.0;
+    private double highFreqDampingHz = 246.94;
+    private double highFreqStepFactor = 0.35;
     private double smoothedFrequency = 0;
     private int stableHits = 0;
     private double[] windowCoefficients = new double[windowSize];
@@ -39,6 +45,7 @@ class TunerEngine {
     private double[] freqScratch = new double[5];
     private int freqIndex = 0;
     private int freqCount = 0;
+    private double lastFrequency = 0;
     private String[] stringLabels = {"E2", "A2", "D3", "G3", "B3", "E4"};
     private double[] stringFrequencies = {82.4069, 110.0, 146.832, 195.998, 246.942, 329.628};
 
@@ -81,14 +88,19 @@ class TunerEngine {
             fillWindow(analysisBuffer);
 
             double amplitudeDb = computeRmsDb(analysisBuffer, windowSize);
-            boolean hasEnergy = amplitudeDb > noiseFloorDb;
+            updateNoiseEstimate(amplitudeDb);
+            double dynamicThreshold = Math.max(noiseFloorDb, noiseEstimateDb + noiseMarginDb);
+            boolean hasEnergy = amplitudeDb > dynamicThreshold;
             double frequency = hasEnergy ? detectFrequency(analysisBuffer, windowSize) : -1;
             double filtered = frequency > 0 ? addFrequencySample(frequency) : 0;
 
             if (filtered > 0) {
-                smoothedFrequency = smoothFrequency(filtered);
+                double stabilized = stabilizeFrequency(filtered, amplitudeDb, dynamicThreshold);
+                smoothedFrequency = smoothFrequency(stabilized);
+                lastFrequency = smoothedFrequency;
             } else {
                 smoothedFrequency = 0;
+                lastFrequency = 0;
                 resetFrequencyHistory();
             }
 
@@ -229,10 +241,40 @@ class TunerEngine {
         }
     }
 
+    private void updateNoiseEstimate(double amplitudeDb) {
+        if (amplitudeDb < noiseEstimateDb) {
+            noiseEstimateDb = amplitudeDb;
+        } else {
+            noiseEstimateDb += noiseEstimateAlpha * (amplitudeDb - noiseEstimateDb);
+        }
+        if (noiseEstimateDb > -20) {
+            noiseEstimateDb = -20;
+        }
+    }
+
+    private double stabilizeFrequency(double candidate, double amplitudeDb, double thresholdDb) {
+        if (lastFrequency <= 0) {
+            return candidate;
+        }
+        double ratio = candidate / lastFrequency;
+        if (ratio < 0.85 && amplitudeDb < thresholdDb + 6.0) {
+            return lastFrequency;
+        }
+        if (candidate >= highFreqDampingHz) {
+            return lastFrequency + (candidate - lastFrequency) * highFreqStepFactor;
+        }
+        return candidate;
+    }
+
     private void onStreamConfig(int actualSampleRate) {
         if (actualSampleRate > 0) {
             sampleRate = actualSampleRate;
         }
+    }
+
+    private void onAudioApi(int api) {
+        // 1 = AAudio (see oboe::AudioApi mapping in native)
+        listener.onAudioApiUsed(api == 1);
     }
 
     void applyConfig(@NonNull TunerSettings settings) {
@@ -255,7 +297,9 @@ class TunerEngine {
         freqScratch = new double[5];
         freqIndex = 0;
         freqCount = 0;
+        noiseEstimateDb = noiseFloorDb - 20.0;
         smoothedFrequency = 0;
+        lastFrequency = 0;
         stableHits = 0;
     }
 

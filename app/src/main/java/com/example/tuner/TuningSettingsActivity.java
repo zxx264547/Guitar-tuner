@@ -7,6 +7,8 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowCompat;
 
 import com.example.tuner.databinding.ActivityTuningSettingsBinding;
@@ -23,6 +25,7 @@ public class TuningSettingsActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityTuningSettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        applyEdgeInsets(binding.getRoot());
 
         currentSettings = TunerSettings.load(this);
         setupTunings();
@@ -109,5 +112,17 @@ public class TuningSettingsActivity extends AppCompatActivity {
             }
         }
         return -1;
+    }
+
+    private void applyEdgeInsets(android.view.View root) {
+        int baseTop = root.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            int topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            view.setPadding(view.getPaddingLeft(),
+                    baseTop + topInset,
+                    view.getPaddingRight(),
+                    view.getPaddingBottom());
+            return insets;
+        });
     }
 }
